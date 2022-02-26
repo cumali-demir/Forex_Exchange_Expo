@@ -84,16 +84,18 @@ const Main = ({navigation}) => {
   React.useEffect(() => {
     socketRef.current = new WebSocket(`wss://ws.finnhub.io?token=${API_KEY}`);
     socketRef.current?.addEventListener('message', function (event) {
-      console.log('socket message', event);
-      if (event.data && event.type === 'trade') {
+      console.log('>>>>>socket message', event);
+      if (event.data) {
         const parsedData = JSON.parse(event.data);
-        const {data} = parsedData || {};
-        const price = data[0].p;
-        setPriceData(prev => [...prev, price]);
+        if (parsedData.type === 'trade') {
+          const {data} = parsedData || {};
+          const price = data[0].p;
+          setPriceData(prev => [...prev, price]);
+        }
       }
     });
     socketRef.current?.addEventListener('open', function (event) {
-      console.log('socket opened', event);
+      console.log('>>>>>socket opened', event);
     });
     socketRef.current?.addEventListener('error', error => {
       Alert.alert('Something went wrong when fetch realtime data');
